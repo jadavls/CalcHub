@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPM 20T Roller Calculator</title>
+    <link rel="manifest" href="manifest.json">
+    <script>
+    if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+    }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0072a0;
+            --secondary-color: #00c6ff;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --accent: #ff5555;
+            --gradient:linear-gradient(135deg, #00c6ff 0%, #0072a0 100%);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background:var(--gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 50px;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: flex-start;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .home-btn {
+            background: var(--gradient);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(5px);
+        }
+
+        .home-btn:hover { background: white; color: var(--primary-color); }
+
+        /* Main Container */
+        .container {
+            width: 92%;
+            max-width: 600px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .inner-header {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+            text-transform: uppercase;
+        }
+
+        .content { padding: 20px; }
+
+        /* Dashboard Items */
+        .new-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 114, 160, 0.3);
+        }
+
+        .new-btn:hover { background: #005b80; transform: translateY(-2px); }
+
+        .dashboard-item {
+            background: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid var(--primary-color);
+            transition: 0.2s;
+        }
+
+        .dashboard-item:hover { background: #f1f1f1; }
+
+        .item-info { cursor: pointer; flex-grow: 1; }
+
+        .delete-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            border-radius: 20px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
+        .input-group input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+
+        /* Visualization & Table */
+        #shaft-viz {
+            background: #e1f5fe;
+            padding: 12px;
+            text-align: center;
+            border-radius: 10px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 15px 0;
+            border: 1px dashed var(--primary-color);
+        }
+       .modal-content{
+         width:80%; max-width:520px;
+       }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #eee; padding: 10px; text-align: center; }
+        th { background: #f4f4f4; color: var(--primary-color); }
+
+        .close-modal { position: absolute; right: 20px; top: 20px; font-size: 34px; cursor: pointer; font-weight:bolder; color: red; }
+
+        .footerr { text-align: center; color: white; font-size: 13px; margin-top: auto; padding: 15px; }
+       .footer {
+           position: fixed;
+           bottom: 0;
+           width: 100%;
+           padding: 15px 0;
+           text-align: center;
+           color: white;
+           font-size: 13px;
+           background: rgba(0, 0, 0, 0.15);
+  }
+    </style>
+    
+</head>
+<body>
+
+<div class="top-nav">
+    <a href="index.html" class="home-btn">
+        <i class="fas fa-arrow-left"></i> Home
+    </a>
+</div>
+
+<div class="container">
+    <div class="inner-header">
+        <i class="fas fa-tools"></i> MPM 20T Roller Calc
+    </div>
+
+    <div class="content">
+        <button class="new-btn" onclick="openInputModal()">
+            <i class="fas fa-plus"></i> New Calculation
+        </button>
+        <div id="history-list"></div>
+    </div>
+</div>
+
+<div id="inputModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('inputModal')">&times;</span>
+        <h3 style="color:var(--primary-color);"><i class="fas fa-edit"></i> New Input</h3>
+        <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
+        
+        <div class="input-group">
+            <label>Tube ID</label>
+            <input type="number" id="inTubeId" step="0.1" value="28.6">
+        </div>
+        <div class="input-group">
+            <label>Fin Width</label>
+            <input type="number" id="inFinWidth" step="0.1" value="15.9">
+        </div>
+        <div class="input-group">
+            <label>Fin Thickness</label>
+            <input type="number" id="inFinThick" step="0.1" value="6">
+        </div>
+        <div class="input-group">
+            <label>Total Pitch</label>
+            <input type="number" id="inPitch" step="1" value="6">
+        </div>
+        
+        <button class="new-btn" style="margin-top:10px;" onclick="saveData()">Calculate Now</button>
+    </div>
+</div>
+
+<div id="resultModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('resultModal')">&times;</span>
+        <h3 style="color:var(--primary-color);"><i class="fas fa-poll-h"></i> Calculation Result</h3>
+        <hr style="border: 0; border-top: 1px solid #eee;">
+        <div id="resultBody"></div>
+    </div>
+</div>
+
+<div class="footer">create by LJ • 2026</div>
+
+<script>
+    const SHAFT_TOTAL = 1260;
+    const ROLLER_SIZES = [100, 45, 30, 20, 10, 5, 4, 3, 2, 1, 0.5, 0.4, 0.3, 0.2, 0.1];
+
+    let history = JSON.parse(localStorage.getItem('roller_history')) || [];
+    renderHistory();
+
+    function renderHistory() {
+        const container = document.getElementById('history-list');
+        if (history.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#888;">No history found.</p>';
+            return;
+        }
+
+        container.innerHTML = '';
+        history.forEach((item, index) => {
+            const fullPitch = item.tube + item.finW;
+            const Width = (item.pitch % 2 !== 0) ? ((fullPitch * item.pitch) + item.tube).toFixed(1) : ((fullPitch * item.pitch) - item.tube).toFixed(1);
+            
+            const div = document.createElement('div');
+            div.className = 'dashboard-item';
+            div.innerHTML = `
+                <div class="item-info" onclick="showResult(${index})">
+                    <div style="font-weight:bold; color:#333;">Tube: ${item.tube} | Fin: ${item.finW}</div>
+                    <div style="font-size:13px; color:#666;">Width: ${Width} | Pitch: ${item.pitch}</div>
+                </div>
+                <button class="delete-btn" onclick="deleteHistory(event, ${index})"><i class="fas fa-trash"></i></button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function openInputModal() { document.getElementById('inputModal').style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+function saveData() {
+    // નવો ડેટા ઓબ્જેક્ટ તૈયાર કરો
+    const newData = {
+        tube: parseFloat(document.getElementById('inTubeId').value),
+        finW: parseFloat(document.getElementById('inFinWidth').value),
+        finTh: parseFloat(document.getElementById('inFinThick').value),
+        pitch: parseFloat(document.getElementById('inPitch').value),
+    };
+
+    // લોજિક: જો ડેટા પહેલેથી હાજર હોય તો તેને લિસ્ટમાંથી દૂર કરો (Over-ride કરવા માટે)
+    history = history.filter(item => {
+        return !(item.tube === newData.tube && 
+                 item.finW === newData.finW && 
+                 item.finTh === newData.finTh && 
+                 item.pitch === newData.pitch);
+    });
+
+    // નવો ડેટા સૌથી ઉપર ઉમેરો
+    history.unshift(newData);
+
+    // લોકલ સ્ટોરેજમાં સેવ કરો
+    localStorage.setItem('roller_history', JSON.stringify(history));
+    
+    // UI અપડેટ કરો
+    renderHistory();
+    closeModal('inputModal');
+    showResult(0);
+}
+
+    function deleteHistory(event, index) {
+        event.stopPropagation();
+        if(confirm("તમે આ રેકોર્ડ ડિલીટ કરવા માંગો છો?")) {
+            history.splice(index, 1);
+            localStorage.setItem('roller_history', JSON.stringify(history));
+            renderHistory();
+        }
+    }
+
+    function showResult(index) {
+        const item = history[index];
+        const resBody = document.getElementById('resultBody');
+        
+        const fullPitch = item.tube + item.finW;
+        const centerSpace = ((fullPitch * item.pitch) + item.tube + 10).toFixed(1);
+        const sideSpace = ((SHAFT_TOTAL - centerSpace) / 2).toFixed(1);
+        const panelWidth = (item.pitch % 2 !== 0) ? ((fullPitch * item.pitch) + item.tube).toFixed(1) : ((fullPitch * item.pitch) - item.tube).toFixed(1);
+        const panelDepth = ((item.tube - item.finTh) / 2).toFixed(2);
+
+        resBody.innerHTML = `
+            <div style="text-align:center; padding:10px; font-weight:bold;">Tube: ${item.tube} | Fin: ${item.finW}</div>
+            <div id="shaft-viz">
+                |----- ${sideSpace} -----|----- ${centerSpace} -----|----- ${sideSpace} -----|
+            </div>
+            <table>
+                <tr><th>Panel Width</th><td style="font-weight:bold; color:green;">${panelWidth}</td></tr>
+                <tr><th>Panel Depth</th><td style="font-weight:bold; color:blue;">${panelDepth}</td></tr>
+            </table><br>
+            <h4 style="text-align:center; margin:0px; color:var(--primary-color);">Roller Breakdowns</h4>
+            <div style="display:flex; gap:10px;">
+                <table id="sideTable"><tr><th>Spacer (Side)</th></tr></table>
+                <table id="centerTable"><tr><th>Center (Tube)</th></tr></table>
+            </div>
+        `;
+
+        generateRollerRows(sideSpace, 'sideTable');
+        generateCenterRows(item.tube, (item.finW - 10), 'centerTable');
+        document.getElementById('resultModal').style.display = 'flex';
+    }
+
+    function generateRollerRows(val, tableId) {
+        const table = document.getElementById(tableId);
+        let remaining = parseFloat(val);
+        ROLLER_SIZES.forEach(size => {
+            let count = Math.floor((remaining + 0.001) / size);
+            for(let i=0; i<count; i++) {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `<td>${size}</td>`;
+                table.appendChild(tr);
+                remaining = (remaining * 10 - size * 10) / 10;
+            }
+        });
+    }
+
+    function generateCenterRows(tube, finModified, tableId) {
+        const table = document.getElementById(tableId);
+        let tr = document.createElement('tr');
+        tr.innerHTML = `<td style="background:#eee; font-weight:bold;">${tube}</td>`;
+        table.appendChild(tr);
+        if(finModified > 0) generateRollerRows(finModified, tableId);
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Card Calculator</title>
+    <link rel="manifest" href="manifest.json">
+    <script>
+    if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+    }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0072a0;
+            --secondary-color: #00c6ff;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --error-color: #d93025;
+            --success-color: #1a73e8;
+            --gradient: linear-gradient(135deg, #00c6ff 0%, #0072a0 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 80px; /* ફૂટર માટે જગ્યા */
+        }
+
+        /* --- Top Navigation --- */
+        .top-nav {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: flex-start;
+            padding: 20px 15px;
+            box-sizing: border-box;
+        }
+
+        .home-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(5px);
+        }
+
+        .home-btn:hover {
+            background: white;
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        /* --- Main Container --- */
+        .container {
+            width: 92%;
+            max-width: 450px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-out;
+            margin-top: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .inner-header {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-content {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+            background-color: #fcfcfc;
+            cursor: pointer;
+        }
+
+        select:focus {
+            border-color: var(--primary-color);
+            background-color: #fff;
+        }
+
+        /* --- Button Style --- */
+        button.calc-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0, 114, 160, 0.3);
+        }
+
+        button.calc-btn:hover {
+            background: #005b80;
+            transform: translateY(-2px);
+        }
+
+        /* --- Result Box --- */
+        #result-box {
+            margin-top: 25px;
+            background: #eef7ff;
+            border-radius: 15px;
+            padding: 20px;
+            display: none;
+            border-left: 5px solid var(--primary-color);
+            animation: zoomIn 0.4s ease;
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .res-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-size: 15px;
+        }
+
+        .res-row:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            color: var(--success-color);
+            font-size: 18px;
+            padding-top: 15px;
+        }
+
+        /* --- Error Toast --- */
+        #error {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--error-color);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* --- Footer Style (Fixed at bottom) --- */
+        .footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Navigation -->
+<div class="top-nav">
+    <a href="index.html" class="home-btn">
+        <i class="fas fa-arrow-left"></i> Home
+    </a>
+</div>
+
+<!-- Error Message Toast -->
+<div id="error"><i class="fas fa-exclamation-triangle"></i> ભૂલ: મારેલ પાસ ટાર્ગેટથી વધુ છે!</div>
+
+<div class="container">
+    <div class="inner-header">
+        <i class="fas fa-file-invoice"></i> Job Card Calc
+    </div>
+
+    <div class="form-content">
+        <div class="form-group">
+            <label><i class="far fa-clock"></i> શિફ્ટનો સમય</label>
+            <select id="shift" onchange="hideRes()">
+                <option value="475">1st shift / 2nd Shift (475 Min)</option>
+                <option value="410">3rd Shift (410 Min)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-bullseye"></i> ટાર્ગેટ પાસ</label>
+            <select id="target" onchange="hideRes()">
+                <script>for(let i=1; i<=10; i++) document.write(`<option value="${i}">${i}</option>`)</script>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-check-circle"></i> મારેલ પાસ (પૂર્ણ કરેલ)</label>
+            <select id="done" onchange="hideRes()">
+                <script>for(let i=1; i<=10; i++) document.write(`<option value="${i}">${i}</option>`)</script>
+            </select>
+        </div>
+
+        <button class="calc-btn" onclick="doCalculation()">ગણતરી કરો</button>
+
+        <!-- Result Box -->
+        <div id="result-box">
+            <div class="res-row">
+                <span><i class="fas fa-hourglass-start"></i> 1 પાસ ટાઈમ:</span> 
+                <span id="opt">00:00</span>
+            </div>
+            <div class="res-row">
+                <span><i class="fas fa-tasks"></i> કુલ પાસનો ટાઈમ:</span> 
+                <span id="apt">00:00</span>
+            </div>
+            <div class="res-row">
+                <span><i class="fas fa-plus-circle"></i> વધારાનો ટાઈમ:</span> 
+                <span id="et">00:00</span>
+            </div>
+            <div class="res-row">
+                <span><i class="fas fa-stopwatch"></i> ટોટલ શિફ્ટ ટાઈમ:</span> 
+                <span id="tt">00:00</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer placed outside container -->
+<div class="footer">create by LJ • 2026</div>
+
+<script>
+    function hideRes() {
+        document.getElementById('result-box').style.display = 'none';
+    }
+
+    function doCalculation() {
+        const shiftVal = parseInt(document.getElementById('shift').value);
+        const targetVal = parseInt(document.getElementById('target').value);
+        const doneVal = parseInt(document.getElementById('done').value);
+        const error = document.getElementById('error');
+        const resBox = document.getElementById('result-box');
+
+        // Validation
+        if (doneVal > targetVal) {
+            error.style.display = 'block';
+            setTimeout(() => error.style.display = 'none', 3000);
+            resBox.style.display = 'none';
+            return;
+        }
+
+        // Calculation Logic
+        let perPassTime = Math.floor(shiftVal / targetVal);
+        let archiveTime = perPassTime * doneVal;
+        
+        // Extra time logic
+        let extraTime = (targetVal === doneVal) ? 0 : (shiftVal - archiveTime);
+
+        // UI Updates
+        document.getElementById('opt').innerText = format(perPassTime);
+        document.getElementById('apt').innerText = format(archiveTime);
+        document.getElementById('et').innerText = format(extraTime);
+        document.getElementById('tt').innerText = format(shiftVal);
+
+        resBox.style.display = 'block';
+    }
+
+    function format(min) {
+        let h = Math.floor(min / 60);
+        let m = min % 60;
+        return (h < 10 ? "0"+h : h) + ":" + (m < 10 ? "0"+m : m);
+    }
+</script>
+
+</body>
+</html>

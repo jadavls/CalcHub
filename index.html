@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalcHub Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <script>
+    if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+    }
+    </script>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0072a0;
+            --secondary-color: #00c6ff;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --gradient: linear-gradient(135deg, #00c6ff 0%, #0072a0 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        /* --- Dashboard Grid --- */
+        .dashboard-grid {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Card Styles --- */
+        .nav-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .nav-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            background: #f8f9fa;
+        }
+
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 5px 15px rgba(0, 114, 160, 0.3);
+        }
+
+        .card-text {
+            flex: 1;
+        }
+
+        .card-text h2 {
+            font-size: 18px;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .card-text p {
+            font-size: 13px;
+            color: #777;
+        }
+
+        .arrow-icon {
+            color: #ccc;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+
+        .nav-card:hover .arrow-icon {
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        /* --- Footer Style --- */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(8px);
+        }
+    </style>
+    
+</head>
+<body>
+
+    <div class="header">
+        <h1>Calculator Hub</h1>
+        <p>તમારા કામને સરળ બનાવો</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Card 1: Shift Calculator -->
+        <a href="shift_calc.html" class="nav-card">
+            <div class="icon-box">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="card-text">
+                <h2>Shift Calculator</h2>
+                <p>ક્યાં દિવસે કઈ શિફ્ટ હશે તે જોવા માટે.</p>
+            </div>
+            <i class="fas fa-chevron-right arrow-icon"></i>
+        </a>
+
+        <!-- Card 2: Job Card Calc -->
+        <a href="job_card_calc.html" class="nav-card">
+            <div class="icon-box">
+                <i class="fas fa-file-invoice"></i>
+            </div>
+            <div class="card-text">
+                <h2>Job Card Calc</h2>
+                <p>mpm પર ટાર્ગેટ પાસ માટે ટાઈમ કેલ્ક્યુલેટ કરવા માટે.</p>
+            </div>
+            <i class="fas fa-chevron-right arrow-icon"></i>
+        </a>
+        
+        <!-- Card 3: Roller Calculator -->
+        <a href="roller_calc.html" class="nav-card">
+            <div class="icon-box">
+                <i class="fas fa-cog"></i>
+            </div>
+            <div class="card-text">
+                <h2>Roller Calculator</h2>
+                <p>mpm 20T પર roller નુ કેલ્ક્યુલેશન કરવા માટે.</p>
+            </div>
+            <i class="fas fa-chevron-right arrow-icon"></i>
+        </a>
+    </div>
+
+    <div class="footer">create by LJ • 2026</div>
+
+</body>
+</html>

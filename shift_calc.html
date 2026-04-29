@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shift Calculator</title>
+    <link rel="manifest" href="manifest.json">
+    <script>
+    if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+    }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0072a0;
+            --secondary-color: #00c6ff;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --gradient:linear-gradient(135deg, #00c6ff 0%, #0072a0 100%);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 60px;
+        }
+
+        .top-nav {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: flex-start;
+            padding: 20px 0 10px 0;
+        }
+
+       .home-btn {
+       background: var(--gradient);
+       color: white;
+       text-decoration: none;
+       padding: 10px 20px;
+       border-radius: 30px;
+       font-weight: 600;
+       display: flex;
+       align-items: center;
+       gap: 8px;
+       transition: 0.3s;
+       border: 1px solid rgba(255, 255, 255, 0.4);
+       backdrop-filter: blur(5px);
+       }
+
+        .home-btn:hover { background: white; color: var(--primary-color); }
+
+        .container {
+            width: 92%;
+            max-width: 500px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .inner-header {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+            text-transform: uppercase;
+        }
+
+        .form-content { padding: 25px; }
+
+        .form-group { margin-bottom: 20px; }
+
+        label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 15px; }
+
+        select, input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+            background-color: #fcfcfc;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            background: #f1f3f5;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .radio-option { display: flex; align-items: center; cursor: pointer; font-size: 15px; color: #444; }
+
+        button.calc-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0, 114, 160, 0.3);
+        }
+
+        button.calc-btn:hover { background: #005b80; transform: translateY(-2px); }
+
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+            animation: slideUp 0.7s ease;
+            border: 1px solid #b3e5fc;
+        }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            padding: 15px 0;
+            text-align: center;
+            color: white;
+            font-size: 13px;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .shift-result { font-size: 26px; color: #2e7d32; font-weight: 800; display: block; margin-top: 5px; }
+    </style>
+    
+</head>
+<body>
+
+<div class="top-nav">
+    <a href="index.html" class="home-btn">
+        <i class="fas fa-arrow-left"></i> Home
+    </a>
+</div>
+
+<div class="container">
+    <div class="inner-header">
+        <i class="fas fa-calendar-alt"></i> Shift Calculator
+    </div>
+
+    <div class="form-content">
+        <div class="form-group">
+            <label>આજની શિફ્ટ પસંદ કરો:</label>
+            <select id="shift" onchange="autoSelectRotation(); hideResult();">
+                <option value="1">1st Shift (સવાર)</option>
+                <option value="0">2nd Shift (બપોર)</option>
+                <option value="2">3rd Shift (રાત)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>તારીખ પસંદ કરો:</label>
+            <input type="date" id="date2" onchange="hideResult()">
+        </div>
+
+        <div class="form-group">
+            <label>શિફ્ટ રોટેશન:</label>
+            <div class="radio-group">
+                <label class="radio-option">
+                    <input type="radio" name="shiftR" id="rot2" value="1" checked onclick="hideResult()"> 2 શિફ્ટ
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="shiftR" id="rot3" value="2" onclick="hideResult()"> 3 શિફ્ટ
+                </label>
+            </div>
+        </div>
+
+        <button class="calc-btn" onclick="calculate()">ગણતરી કરો</button>
+
+        <div id="output"></div>
+    </div>
+</div>
+
+<div class="footer">create by LJ • 2026</div>
+
+<script>
+    const display = document.getElementById("output");
+
+    function autoSelectRotation() {
+        let currentShift = document.getElementById("shift").value;
+        // જો નાઈટ શિફ્ટ (2) સિલેક્ટ થાય તો ઓટોમેટિક 3 શિફ્ટ રોટેશન સિલેક્ટ કરો
+        if (currentShift === "2") {
+            document.getElementById("rot3").checked = true;
+        }
+    }
+
+    function calculate() {
+        let d2Value = document.getElementById("date2").value;
+        if (!d2Value) { alert("કૃપા કરીને તારીખ પસંદ કરો!"); return; }
+
+        let d1 = new Date(); d1.setHours(0, 0, 0, 0);
+        let d2 = new Date(d2Value); d2.setHours(0, 0, 0, 0);
+
+        let diffDays = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+        if (diffDays < 0) {
+            display.style.display = "block";
+            display.innerHTML = "ભવિષ્યની તારીખ પસંદ કરો.";
+            display.style.background = "#ffebee";
+            return;
+        }
+
+        let currentShift = parseInt(document.getElementById("shift").value);
+        let weeks = Math.floor((diffDays + d1.getDay()) / 7);
+        let rotationType = document.querySelector('input[name="shiftR"]:checked').value;
+        let d = parseInt(rotationType);
+
+        let futureShift = currentShift;
+        for (let i = 0; i < weeks; i++) {
+            futureShift++;
+            if (futureShift > d) futureShift = 0;
+        }
+
+        let shiftName = "";
+        switch (futureShift) {
+            case 0: shiftName = "Second (બપોર)"; break;
+            case 1: shiftName = "First (સવાર)"; break;
+            case 2: shiftName = "Night (રાત)"; break;
+        }
+
+        display.style.display = "block";
+        display.style.background = "#f1f8e9";
+        display.innerHTML = `આ દિવસે તમારી શિફ્ટ હશે: <br> <span class="shift-result">${shiftName}</span>`;
+    }
+
+    function hideResult() { display.style.display = "none"; }
+</script>
+
+</body>
+</html>

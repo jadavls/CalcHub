@@ -20,6 +20,7 @@
             --error-color: #d93025;
             --success-color: #1a73e8;
             --gradient: linear-gradient(135deg, #00c6ff 0%, #0072a0 100%);
+            --btn:rgba(8, 95, 130, 0.6);
         }
 
         * {
@@ -48,18 +49,19 @@
             box-sizing: border-box;
         }
 
+
         .home-btn {
-            background: rgba(255, 255, 255, 0.2);
+            background: var(--btn);
             color: white;
             text-decoration: none;
             padding: 10px 20px;
-            border-radius: 30px;
+            border-radius: 10px;
             font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
             transition: 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid var(--primary-color);
             backdrop-filter: blur(5px);
         }
 
@@ -68,6 +70,59 @@
             color: var(--primary-color);
             transform: translateX(5px);
         }
+
+      #nomsbtn{
+         background: var(--btn);
+         color: white;
+         text-decoration: none;
+         padding: 10px 20px;
+         border-radius: 10px;
+         font-weight:bolder;
+         display: flex;
+         align-items: center;
+         position:absolute;
+         right:20px;
+         gap: 8px;
+         transition: 0.3s;
+         border: 1px solid var(--primary-color);
+         backdrop-filter: blur(5px);
+        }
+      /* ટેબલ સ્ટાઇલ */
+      caption{
+        font-size:25px;
+        margin:20px auto 10px auto;
+        font-weight:bolder;
+        color:var(--primary-color);
+      }
+       table {
+           width: 90%;
+           border-collapse: collapse;
+           margin: 10px auto 50px auto;
+           border:1px solid #ddd;
+       }
+      
+       th, td {
+           text-align: center;
+           padding: 5px;
+           font-size:20px;
+           border: 1px solid #ddd;
+           font-weight:500;
+       }
+       tr:nth-child(odd) {
+        background:#def;
+       }
+      
+       /* હેડિંગ સ્ટાઇલ */
+       th {
+           background-color: var(--primary-color);
+           color: white;
+           font-size: 20px;
+           letter-spacing: 0.5px;
+           text-align:center;
+           font-weight:bolder;
+       }
+       
+       
 
         /* --- Main Container --- */
         .container {
@@ -79,6 +134,9 @@
             overflow: hidden;
             animation: fadeIn 0.6s ease-out;
             margin-top: 10px;
+            display:flex;
+            flex-direction:column;
+            
         }
 
         @keyframes fadeIn {
@@ -151,6 +209,48 @@
             background: #005b80;
             transform: translateY(-2px);
         }
+        /* ફુલ સ્ક્રીન ઓવરલે (બેકગ્રાઉન્ડ) */
+     .overlay {
+        display: flex; /* શરૂઆતમાં છુપાયેલું */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8); /* ઝાંખું કાળું બેકગ્રાઉન્ડ */
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        visibility:hidden;
+        }
+        
+        /* પોપ-અપ કન્ટેનર */
+     .modal-content {
+        background-color: white;
+        width: 90%;
+        max-width: 500px;
+        padding: 10px;
+        border-radius: 5px;
+        position: relative;
+        text-align: center;
+        box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+        /* એનિમેશન */
+        transform: scale(0.8);
+        opacity: 0;
+        transition: all 0.3s ease-in-out;
+        }
+        
+        /* જ્યારે એક્ટિવ હોય ત્યારે એનિમેશન બતાવવા માટે */
+     .overlay.active {
+        visibility:visible;
+        }
+        
+     .overlay.active .modal-content {
+        transform: scale(1);
+        opacity:1;
+        }
+        
+        
 
         /* --- Result Box --- */
         #result-box {
@@ -202,18 +302,15 @@
 
         /* --- Footer Style (Fixed at bottom) --- */
         .footer {
-            text-align: center;
-            padding: 15px;
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.9);
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(8px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.9);
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(8px);}
     </style>
 </head>
 <body>
@@ -223,11 +320,25 @@
     <a href="index.html" class="home-btn">
         <i class="fas fa-arrow-left"></i> Home
     </a>
+    <div id="nomsbtn" onclick="toggleModal(true)">see outPut Norms</div>
 </div>
+
 
 <!-- Error Message Toast -->
 <div id="error"><i class="fas fa-exclamation-triangle"></i> ભૂલ: મારેલ પાસ ટાર્ગેટથી વધુ છે!</div>
-
+<div id="fullScreenOverlay" class="overlay">
+  <div class="modal-content">
+  <table>
+    <caption>OutPut Norms Of MPM</caption>
+    <tr><th>Length Range</br>(mm)</th><th>OutPut Norms</br>(pass/shift)</th></tr>
+    <tr><td>6000-8000</td><td>9</td></tr>
+    <tr><td>8001-10000</td><td>8</td></tr>
+    <tr><td>10001-15000</td><td>7</td></tr>
+    <tr><td>15001-20000</td><td>6</td></tr>
+    <tr><td>20001-23000</td><td>5</td></tr>
+  </table>
+ </div>
+</div>
 <div class="container">
     <div class="inner-header">
         <i class="fas fa-file-invoice"></i> Job Card Calc
@@ -238,7 +349,7 @@
             <label><i class="far fa-clock"></i> શિફ્ટનો સમય</label>
             <select id="shift" onchange="hideRes()">
                 <option value="475">1st shift / 2nd Shift</option>
-                <option value="410">3rd Shift</option>
+                <option value="410">3rd Shift </option>
             </select>
         </div>
 
@@ -324,6 +435,24 @@
         let m = min % 60;
         return (h < 10 ? "0"+h : h) + ":" + (m < 10 ? "0"+m : m);
     }
+    function toggleModal(show) {
+        var overlay = document.getElementById("fullScreenOverlay");
+        if (show) {
+            overlay.classList.add("active");
+        } else {
+            overlay.classList.remove("active");
+        }
+    }
+    
+    // જો યુઝર પોપ-અપની બહાર (કાળા ભાગમાં) ક્લિક કરે તો પણ બંધ થાય
+    window.onclick = function(event) {
+        var overlay = document.getElementById("fullScreenOverlay");
+        if (event.target == overlay) {
+            toggleModal(false);
+        }
+    }
+    
+    
 </script>
 
 </body>

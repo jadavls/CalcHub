@@ -19,6 +19,7 @@
             --card-bg: #ffffff;
             --text-color: #333;
             --gradient:linear-gradient(135deg, #00c6ff 0%, #0072a0 100%);
+            --btn:rgba(8, 95, 130, 0.6);        
         }
 
         body {
@@ -41,17 +42,18 @@
         }
 
        .home-btn {
-       background: var(--gradient);
+       background: var(--btn);
        color: white;
        text-decoration: none;
+       margin-left:20px;
        padding: 10px 20px;
-       border-radius: 30px;
-       font-weight: 600;
+       border-radius: 10px;
+       font-weight:bolder;
        display: flex;
        align-items: center;
        gap: 8px;
        transition: 0.3s;
-       border: 1px solid rgba(255, 255, 255, 0.4);
+       border: 1px solid var(--primary-color);
        backdrop-filter: blur(5px);
        }
 
@@ -65,6 +67,13 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.2);
             box-sizing: border-box;
             overflow: hidden;
+            margin-top:20px;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .inner-header {
@@ -102,8 +111,24 @@
             padding: 12px;
             border-radius: 10px;
         }
+        input[type="radio"]{
+          accent-color:var(--primary-color);
+        }
 
-        .radio-option { display: flex; align-items: center; cursor: pointer; font-size: 15px; color: #444; }
+        .radio-option { 
+           display: flex; 
+           text-align:center;
+           cursor: pointer; 
+           margin:5px;
+           gap:5px;
+           font-size: 15px; 
+           color: #333; 
+           padding:5px;
+         }
+         .radio-option span{
+           font-size:18px;
+           line-height:1.6;
+         }
 
         button.calc-btn {
             width: 100%;
@@ -130,9 +155,10 @@
             display: none;
             animation: slideUp 0.7s ease;
             border: 1px solid #b3e5fc;
+            
         }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
         .footer {
             position: fixed;
@@ -178,13 +204,15 @@
         </div>
 
         <div class="form-group">
-            <label>શિફ્ટ રોટેશન:</label>
+            <label>શિફ્ટ રોટેશન પસંદ કરો :</label>
             <div class="radio-group">
                 <label class="radio-option">
-                    <input type="radio" name="shiftR" id="rot2" value="1" checked onclick="hideResult()"> 2 શિફ્ટ
+                    <input type="radio" name="shiftR" id="rot2" value="1" checked onclick="hideResult()"> 
+                    <span><strong>2</strong> શિફ્ટ</span>
                 </label>
                 <label class="radio-option">
-                    <input type="radio" name="shiftR" id="rot3" value="2" onclick="hideResult()"> 3 શિફ્ટ
+                    <input type="radio" name="shiftR" id="rot3" value="2" onclick="hideResult()"> 
+                    <span><strong>3</strong> શિફ્ટ</span>
                 </label>
             </div>
         </div>

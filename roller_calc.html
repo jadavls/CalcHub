@@ -20,6 +20,7 @@
             --card-bg: #ffffff;
             --accent: #ff5555;
             --gradient:linear-gradient(135deg, #00c6ff 0%, #0072a0 100%);
+            --btn:rgba(8, 95, 130, 0.6);
         }
 
         body {
@@ -44,17 +45,18 @@
         }
 
         .home-btn {
-            background: var(--gradient);
+            background: var(--btn);
             color: white;
             text-decoration: none;
             padding: 10px 20px;
-            border-radius: 30px;
-            font-weight: 600;
+            border-radius: 10px;
+            font-weight:bolder;
             display: flex;
             align-items: center;
             gap: 8px;
+            margin-left:5px;
             transition: 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid var(--primary-color);
             backdrop-filter: blur(5px);
         }
 
@@ -69,6 +71,12 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.2);
             overflow: hidden;
             margin-bottom: 20px;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .inner-header {
@@ -176,14 +184,15 @@
 
         .footerr { text-align: center; color: white; font-size: 13px; margin-top: auto; padding: 15px; }
        .footer {
-           position: fixed;
-           bottom: 0;
-           width: 100%;
-           padding: 15px 0;
-           text-align: center;
-           color: white;
-           font-size: 13px;
-           background: rgba(0, 0, 0, 0.15);
+    text-align: center;
+    padding: 20px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.9);
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(8px);
   }
     </style>
     
@@ -265,13 +274,13 @@
         history.forEach((item, index) => {
             const fullPitch = item.tube + item.finW;
             const Width = (item.pitch % 2 !== 0) ? ((fullPitch * item.pitch) + item.tube).toFixed(1) : ((fullPitch * item.pitch) - item.tube).toFixed(1);
-            
+            const panelDepth = ((item.tube - item.finTh) / 2).toFixed(2);
             const div = document.createElement('div');
             div.className = 'dashboard-item';
             div.innerHTML = `
                 <div class="item-info" onclick="showResult(${index})">
-                    <div style="font-weight:bold; color:#333;">Tube: ${item.tube} | Fin: ${item.finW}</div>
-                    <div style="font-size:13px; color:#666;">Width: ${Width} | Pitch: ${item.pitch}</div>
+                    <div style="font-weight:bold; color:#333;">Tube: ${item.tube} | Fin: ${item.finW} x Th: ${item.finTh}</div>
+                    <div style="font-size:13px; color:#666;">Width: ${Width} | Defth: ${panelDepth}</div>
                 </div>
                 <button class="delete-btn" onclick="deleteHistory(event, ${index})"><i class="fas fa-trash"></i></button>
             `;
@@ -331,18 +340,18 @@ function saveData() {
         const panelDepth = ((item.tube - item.finTh) / 2).toFixed(2);
 
         resBody.innerHTML = `
-            <div style="text-align:center; padding:10px; font-weight:bold;">Tube: ${item.tube} | Fin: ${item.finW}</div>
+            <div style="text-align:center; padding:10px; font-weight:bold; font-size:20px; color:#0072a0;">Tube: ${item.tube} | Fin: ${item.finW} x Th: ${item.finTh}</div>
             <div id="shaft-viz">
-                |-- ${sideSpace} --|-- ${centerSpace} --|-- ${sideSpace} --|
+                |--- ${sideSpace} ---|--- ${centerSpace} ---|--- ${sideSpace} ---|
             </div>
             <table>
-                <tr><th>Panel Width</th><td style="font-weight:bold; color:green;">${panelWidth}</td></tr>
-                <tr><th>Panel Depth</th><td style="font-weight:bold; color:blue;">${panelDepth}</td></tr>
+                <tr><th>Panel Width</th><td style="font-weight:bold; color:#0072a0;">${panelWidth}</td></tr>
+                <tr><th>Panel Depth</th><td style="font-weight:bold; color:#0072a0;">${panelDepth}</td></tr>
             </table><br>
             <h4 style="text-align:center; margin:0px; color:var(--primary-color);">Roller Breakdowns</h4>
             <div style="display:flex; gap:10px;">
-                <table id="sideTable"><tr><th>Spacer (Side)</th></tr></table>
-                <table id="centerTable"><tr><th>Center (Tube)</th></tr></table>
+                <table id="sideTable"><tr><th>Spacer Roller</th></tr></table>
+                <table id="centerTable"><tr><th>Center Roller</th></tr></table>
             </div>
         `;
 

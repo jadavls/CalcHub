@@ -1,4 +1,4 @@
-const CACHE_NAME = 'Calc-hub-v1';
+const CACHE_NAME = 'Calc-hub-v2';
 const assets = [
   'index.html',
   'shift_calc.html',

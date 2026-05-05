@@ -5,11 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CalcHub Dashboard</title>
     <link rel="manifest" href="manifest.json">
-    <script>
-    if('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-    }
-    </script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        
+        // જ્યારે પણ એપ ઓપન થાય ત્યારે અપડેટ ચેક કરો
+        reg.update();
+
+        reg.onupdatefound = () => {
+          const installingWorker = reg.installing;
+          installingWorker.onstatechange = () => {
+            if (installingWorker.state === 'installed') {
+              if (navigator.serviceWorker.controller) {
+                // નવો અપડેટ મળી ગયો છે!
+                console.log('નવો અપડેટ મળી ગયો છે. એપ રિફ્રેશ થઈ રહી છે...');
+                
+                // જૂના સર્વિસ વર્કરને હટાવી નવાને એક્ટિવેટ કરવા માટે રિફ્રેશ
+                window.location.reload();
+              }
+            }
+          };
+        };
+      }).catch(err => console.log('Service Worker Error', err));
+    });
+
+    // જો સર્વિસ વર્કરમાં કોઈ ફેરફાર થાય તો પેજ ઓટોમેટિક રિફ્રેશ થશે
+    let refreshing;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      window.location.reload();
+      refreshing = true;
+    });
+  }
+</script>
     
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
